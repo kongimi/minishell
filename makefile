@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: npiyapan <niran.analas@gmail.com>          +#+  +:+       +#+         #
+#    By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/19 15:55:33 by npiyapan          #+#    #+#              #
-#    Updated: 2024/04/20 23:53:15 by npiyapan         ###   ########.fr        #
+#    Updated: 2024/04/25 16:18:11 by npiyapan         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,10 +26,10 @@ LIBFT = $(LIBFT_DIR)libft.a
 
 OBJ_DIR = bin/
 CC = cc
-# CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra
 # CFLAGS = -Wall -Werror -Wextra -g
 # CFLAGS = -fsanitize=thread -g -lpthread
-CFLAGS = -Wno-nullability-completeness -fsanitize=address
+# CFLAGS = -Wno-nullability-completeness -fsanitize=address
 
 SRC_DIR = src/
 SRC_FILE = minishell utils parse_env signals my_loop
@@ -48,7 +48,7 @@ bin/%.o: src/%.c
 	@mkdir -p bin
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(NAME): $(OBJ) 
+$(NAME): $(OBJ)
 	$(MAKE) -C $(LIBFT_DIR)
 	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) $(READLINE_LIB) -o $(NAME)
 
