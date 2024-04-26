@@ -6,7 +6,7 @@
 #    By: npiyapan <niran.analas@gmail.com>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/19 15:55:33 by npiyapan          #+#    #+#              #
-#    Updated: 2024/04/21 15:12:17 by npiyapan         ###   ########.fr        #
+#    Updated: 2024/04/26 12:24:59 by npiyapan         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,11 +62,5 @@ fclean: clean
 	rm -f $(LIBFT_DIR)libft.a
 
 re: fclean all
-
-# v:
-# 	valgrind ./$(NAME) 4 310 200 100
-
-# vh:
-# 	valgrind --tool=helgrind ./$(NAME) 4 310 200 100
 
 .PHONY: all bonus clean fclean re

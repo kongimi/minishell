@@ -6,7 +6,7 @@
 /*   By: npiyapan <niran.analas@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 23:49:35 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/04/26 11:56:19 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/04/26 12:58:20 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ void	my_loop(t_tools *tools)
 	char	*tmp;
 	int		fork_value;
 	int		status;
+	int		i;
 
 	tools->args = readline(READLINE_MSG);
 	tmp = ft_strtrim(tools->args, " ");
@@ -69,6 +70,15 @@ void	my_loop(t_tools *tools)
 	{
 		if (!access(tools->cmds->str[0], F_OK))
 			execve(tools->cmds->str[0], tools->cmds->str, tools->envi);
+		i = 0;
+		while (tools->envi[i])
+		{
+			tmp = ft_strjoin(tools->paths[i], tools->cmds->str[0]);
+			if (!access(tmp, F_OK))
+				execve(tmp, tools->cmds->str, tools->envi);
+			free (tmp);
+			i++;
+		}
 	}
 	waitpid(fork_value, &status, 0);
 	free(tools->cmds->str[0]);
