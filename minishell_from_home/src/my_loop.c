@@ -6,7 +6,7 @@
 /*   By: npiyapan <niran.analas@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 23:49:35 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/04/26 12:58:20 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/04/28 12:33:28 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,54 @@
 void	init_cmd(t_tools *tools)
 {
 	char	**str;
-	int		arg_size;
+	// int		arg_size;
 	t_cmds	*cmd_tmp;
 
-	arg_size = ft_strlen(tools->args);
-	str = ft_calloc(arg_size + 1, sizeof(char *));
+	cmd_tmp = malloc(sizeof(t_cmds));
+	if (!cmd_tmp)
+		print_error("fail to malloc t_cmds", 2);
+	str = ft_calloc(2, sizeof(char *));
 	if (!str)
 		print_error("Fail to calloc in init_cmd", 2);
-	cmd_tmp->str[0] = ft_strdup(tools->args);
-	cmd_tmp->str[1] = 0;
-	cmd_tmp->str[2] = 0;
+	str[0] = ft_strdup(tools->args);
+	str[1] = 0;
+	cmd_tmp->str = str;
 	cmd_tmp->next = NULL;
 	cmd_tmp->prev = NULL;
-	free (tools->args);
 	tools->cmds = cmd_tmp;
+}
+
+void	ft_trim(t_tools *tools)
+{
+	char	*tmp;
+
+	tmp = ft_strtrim(tools->args, " ");
+	free (tools->args);
+	if (!tmp)
+	{
+		ft_putendl_fd("fail from ft_trim", 2);
+		g_global.exit_status = 1;
+		exit (1);
+	}
+	tools->args = ft_strdup(tmp);
+	free (tmp);
+	if (!tools->args)
+	{
+		free (tools->args);
+		ft_putendl_fd("fail from strdup in my_loop", 2);
+		g_global.exit_status = 1;
+		exit (1);
+	}
+}
+
+void	ft_print_err(char *str1, char *str2)
+{
+	char	*str3;
+
+	str3 = ft_strjoin(str1, str2);
+	if (!str3)
+		ft_putendl_fd("error from ft_print_err", 2);
+	ft_putendl_fd(str3, 2);
 }
 
 void	my_loop(t_tools *tools)
@@ -41,28 +75,20 @@ void	my_loop(t_tools *tools)
 	int		i;
 
 	tools->args = readline(READLINE_MSG);
-	tmp = ft_strtrim(tools->args, " ");
-	free (tools->args);
-	tools->args = ft_strdup(tmp);
-	free (tmp);
-	if (!tools->args)
-	{
-		free (tools->args);
-		ft_putendl_fd("fail from strdup in my_loop", 1);
-		g_global.exit_status = 1;
-		return ;
-	}
+	ft_trim(tools);
 	add_history(tools->args);
 	init_cmd(tools);
-	// printf("cmd = %s\n", tools->cmds->str[0]);
 	if (!ft_strncmp(tools->cmds->str[0], "exit", 4))
 	{
-		free(tools->cmds->str[0]);
+		free(tools->args);
+		free_arr(tools->cmds->str);
+		free(tools->cmds);
 		exit (0);
 	}
 	fork_value = fork();
 	if (fork_value < 0)
 	{
+		free(tools->args);
 		ft_putendl_fd("fail to fork", 2);
 		g_global.exit_status = 1;
 	}
@@ -71,7 +97,7 @@ void	my_loop(t_tools *tools)
 		if (!access(tools->cmds->str[0], F_OK))
 			execve(tools->cmds->str[0], tools->cmds->str, tools->envi);
 		i = 0;
-		while (tools->envi[i])
+		while (tools->paths[i])
 		{
 			tmp = ft_strjoin(tools->paths[i], tools->cmds->str[0]);
 			if (!access(tmp, F_OK))
@@ -79,8 +105,10 @@ void	my_loop(t_tools *tools)
 			free (tmp);
 			i++;
 		}
+		ft_print_err("command not found : ", tools->args);
+		exit (0);
 	}
 	waitpid(fork_value, &status, 0);
-	free(tools->cmds->str[0]);
-	// 
+	free_arr(tools->cmds->str);
+	free (tools->args);
 }
