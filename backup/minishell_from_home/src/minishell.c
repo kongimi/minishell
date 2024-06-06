@@ -6,7 +6,7 @@
 /*   By: npiyapan <niran.analas@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:21:54 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/04/26 11:58:04 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/05/26 23:28:55 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,11 @@ int	main(int argc, char **argv, char **env)
 	tools.pwd = 0;
 	tools.oldpwd = 0;
 	tools.paths = 0;
+	tools.pipes = 0;
 	tools.envi = ft_dup_arr(env);
+	tools.lexer_list = NULL;
+	tools.pid = 0;
+	tools.reset = false;
 	if (!tools.envi)
 		print_error("failed to dup env", 1);
 	if (!find_pwd(&tools))
