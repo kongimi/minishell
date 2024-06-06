@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:20:17 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/04/25 16:19:05 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/06 11:56:06 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,4 +33,10 @@
 extern t_global	g_global;
 
 void	my_loop(t_tools *tools);
+int		token_analyze(t_tools *tools);
+int		parser(t_tools *tools);
+t_lexer	*ft_lexernew(char *str, int token);
+void	ft_lexeradd_back(t_lexer **lst, t_lexer *new);
+void	init_cmd(t_tools *tools);
+void	ft_lexerclear(t_lexer **lst);
 #endif
