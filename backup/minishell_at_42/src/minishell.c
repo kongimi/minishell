@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:21:54 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/04/25 16:36:44 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/06 13:33:09 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ int	main(int argc, char **argv, char **env)
 	tools.paths = 0;
 	tools.envi = ft_dup_arr(env);
 	tools.cmds = NULL;
+	tools.lexer_list = NULL;
 	if (!tools.envi)
 		print_error("failed to dup env", 1);
 	if (!find_pwd(&tools))
@@ -63,14 +64,13 @@ int	main(int argc, char **argv, char **env)
 	// sigaction(SIGQUIT, &sa, 0);
 	while (!g_global.exit_status)
 		my_loop(&tools);
-	free_arr(tools.envi);
+	if (tools.envi)
+		free_arr(tools.envi);
 	if (tools.pwd)
 		free(tools.pwd);
 	if (tools.oldpwd)
 		free(tools.oldpwd);
 	if (tools.paths)
 		free_arr(tools.paths);
-	if (tools.cmds)
-		free(tools.cmds);
 	return (0);
 }
