@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 16:30:10 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/06 11:49:05 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/08 12:11:20 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,18 +25,18 @@ t_cmds	*initialize_cmd(char **str)
 	return (node);
 }
 
-// void	count_pipes(t_lexer *lexer_list, t_tools *tools)
-// {
-// 	t_lexer	*tmp;
+void	count_pipes(t_lexer *lexer_list, t_tools *tools)
+{
+	t_lexer	*tmp;
 
-// 	tmp = lexer_list;
-// 	while (tmp)
-// 	{
-// 		if (tmp->token == PIPE)
-// 			tools->pipes++;
-// 		tmp = tmp->next;
-// 	}
-// }
+	tmp = lexer_list;
+	while (tmp)
+	{
+		if (tmp->token == PIPE)
+			tools->pipes++;
+		tmp = tmp->next;
+	}
+}
 
 void	ft_cmdsclear(t_cmds **lst)
 {
@@ -65,7 +65,8 @@ int	implement_tools(t_tools *tools)
 	tools->cmds = NULL;
 	tools->lexer_list = NULL;
 	// tools->reset = false;
-	// tools->pid = NULL;
+	tools->pid = NULL;
+	tools->pipes = 0;
 	// tools->heredoc = false;
 	// g_global.stop_heredoc = 0;
 	// g_global.in_cmd = 0;
@@ -90,6 +91,22 @@ int	reset_tools(t_tools *tools)
 	return (1);
 }
 
+void	ft_cmds_add_back(t_cmds **lst, t_cmds *new)
+{
+	t_cmds	*tmp;
+
+	tmp = *lst;
+	if (*lst == NULL)
+	{
+		*lst = new;
+		return ;
+	}
+	while (tmp->next != NULL)
+		tmp = tmp->next;
+	tmp->next = new;
+	new->prev = tmp;
+}
+
 int	parser(t_tools *tools)
 {
 	t_cmds	*node;
@@ -99,7 +116,7 @@ int	parser(t_tools *tools)
 	int		lexer_len;
 
 	tools->cmds = NULL;
-	// count_pipes(tools->lexer_list, tools_tmp);
+	count_pipes(tools->lexer_list, tools);
 	
 	// if (tools->lexer_list->token == PIPE)
 	// {
@@ -122,15 +139,20 @@ int	parser(t_tools *tools)
 	i = 0;
 	while (tools->lexer_list)
 	{
+		if (tools->lexer_list && tools->lexer_list->token == PIPE)
+			ft_lexerdelone(&tools->lexer_list, tools->lexer_list->i);
 		str[i] = ft_strdup(tools->lexer_list->str);
 		i++;
+		str[i] = 0;
+		node = initialize_cmd(str);
+		if (!tools->cmds)
+			tools->cmds = &node;
+		else
+			ft_cmds_add_back(tools->cmds, node);
 		tmp = tools->lexer_list->next;
 		free (tools->lexer_list->str);
 		free (tools->lexer_list);
 		tools->lexer_list = tmp;
 	}
-	str[i] = 0;
-	node = initialize_cmd(str);
-	tools->cmds = &node;
 	return (1);
 }
