@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:20:17 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/06 11:56:06 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/08 13:44:01 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,4 +39,7 @@ t_lexer	*ft_lexernew(char *str, int token);
 void	ft_lexeradd_back(t_lexer **lst, t_lexer *new);
 void	init_cmd(t_tools *tools);
 void	ft_lexerclear(t_lexer **lst);
+void	ft_lexerdelone(t_lexer **lst, int key);
+int		reset_tools(t_tools *tools);
+int		ft_error(int error, t_tools *tools);
 #endif
