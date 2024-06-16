@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:20:17 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/13 15:59:39 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/16 12:55:09 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,6 @@ void	ft_lexerclear(t_lexer **lst);
 void	ft_lexerdelone(t_lexer **lst, int key);
 int		reset_tools(t_tools *tools);
 int		ft_error(int error, t_tools *tools);
-void	basic_cmd(t_tools *tools);
+void	basic_cmd2(t_tools *tools);
 int		executor(t_tools *tools);
 #endif

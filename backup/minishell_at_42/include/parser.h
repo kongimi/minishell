@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 12:34:51 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/08 13:42:57 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/16 15:14:10 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,20 @@ typedef struct s_tools
 	char					**paths;
 	char					*pwd;
 	char					*oldpwd;
-	struct s_cmds			**cmds;
+	struct s_cmds			*cmds;
 	t_lexer					*lexer_list;
 	int						*pid;
 	int						pipes;
 	bool					reset;
 }	t_tools;
+
+typedef struct s_parser_tools
+{
+	t_lexer			*lexer_list;
+	t_lexer			*redirections;
+	int				num_redirections;
+	struct s_tools	*tools;
+}	t_parser_tools;
 
 void	free_arr(char **arr);
 void	init_signal(void);
