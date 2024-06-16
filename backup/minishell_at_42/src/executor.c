@@ -6,11 +6,12 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 13:13:32 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/13 16:10:52 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/16 13:44:48 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include <stdio.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -67,45 +68,47 @@ int	executor(t_tools *tools)
 	int		fd[2];
 	int		fork_id;
 	t_cmds	*tmp_cmds;
+	int		i = 0;
 
-	tmp_cmds = *tools->cmds;
-	while (tools->cmds)
+	tmp_cmds = tools->cmds;
+	if (tmp_cmds)
+		printf("cmd = %s\n", tmp_cmds->str[0]);
+	else
+		printf("not have cmd\n");
+	while (i++ < 2)
 	{
 		printf("in executor\n");
-		// tools->cmds = call_expander(tools, tools->cmds);
-		if (tmp_cmds->next)
-		{
-			if (pipe(fd) == -1){
-				ft_putendl_fd("error from try pipe", STDOUT_FILENO);
-				return 1;
-			}
-			fork_id = fork();
-			if (fork_id == -1){
-				ft_putendl_fd("error from try fork", STDOUT_FILENO);
+		if (pipe(fd) == -1){
+			ft_putendl_fd("error from try pipe", STDOUT_FILENO);
+			return 1;
+		}
+		fork_id = fork();
+		if (fork_id == -1){
+			ft_putendl_fd("error from try fork", STDOUT_FILENO);
+			return 2;
+		}
+		if (fork_id == 0){ // child process
+			printf("child process\n");
+			if (dup2(fd[0], STDIN_FILENO) || dup2(fd[1], STDOUT_FILENO)){
+				// ft_putendl_fd("error from try fork", STDOUT_FILENO);
+				perror("dup2");
 				return 2;
 			}
-			if (fork_id == 0){ // child process
-				printf("child process\n");
-				if (dup2(fd[1], STDOUT_FILENO) == -1){
-					ft_putendl_fd("error from try fork", STDOUT_FILENO);
-					return 2;
-				}
 
-				printf("child process2\n");
-				close(fd[1]);
-				close(fd[0]);
-				printf("child process3\n");
-				basic_cmd(tools);
-			}else{	// parent process
-				close(fd[1]);
-				dup2(fd[0], STDIN_FILENO);
-				close(fd[0]);
-				tmp_cmds = tmp_cmds->next;
-				tmp_cmds = tmp_cmds->next;
-				basic_cmd(tools);
-			}
-			waitpid(fork_id, NULL, 0);
+			printf("child process2\n");
+			close(fd[1]);
+			close(fd[0]);
+			printf("child process3\n");
+			basic_cmd2(tools);
+			exit(0);
 		}
+		
+		
+		if  (tmp_cmds->next)
+			tmp_cmds = tmp_cmds->next;
+		else
+			waitpid(fork_id, NULL, 0);
+		// }
 		
 	}
 	return (0);

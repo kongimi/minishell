@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 23:49:35 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/08 12:13:44 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/16 15:44:09 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,28 @@ void	fork_error(t_tools *tools)
 	g_global.exit_status = 1;
 }
 
+void	basic_cmd2(t_tools *tools)
+{
+	t_cmds			*tmp_cmds;
+	char			*tmp;
+	int				i;
+
+	tmp_cmds = tools->cmds;
+	if (!access(tmp_cmds->str[0], X_OK))
+			execve(tmp_cmds->str[0], tmp_cmds->str, tools->envi);
+		i = 0;
+		while (tools->paths[i])
+		{
+			tmp = ft_strjoin(tools->paths[i], tmp_cmds->str[0]);
+			if (!access(tmp, F_OK))
+				execve(tmp, tmp_cmds->str, tools->envi);
+			free (tmp);
+			i++;
+		}
+		ft_print_err("command not found : ", tools->args);
+		exit (0);
+}
+
 void	basic_cmd(t_tools *tools)
 {
 	t_loop_tools	my_tools;
@@ -63,19 +85,19 @@ void	basic_cmd(t_tools *tools)
 
 	// check_exit(tools);
 
-	tmp_cmds = *tools->cmds;
+	tmp_cmds = tools->cmds;
 	my_tools.fork_value = fork();
 	if (my_tools.fork_value < 0)
 		fork_error(tools);
 	if (my_tools.fork_value == 0)
 	{
-		if (!access(tmp_cmds->str[0], F_OK))
+		if (!access(tmp_cmds->str[0], X_OK))
 			execve(tmp_cmds->str[0], tmp_cmds->str, tools->envi);
 		my_tools.i = 0;
 		while (tools->paths[my_tools.i])
 		{
 			my_tools.tmp = ft_strjoin(tools->paths[my_tools.i], tmp_cmds->str[0]);
-			if (!access(my_tools.tmp, F_OK))
+			if (!access(my_tools.tmp, X_OK))
 				execve(my_tools.tmp, tmp_cmds->str, tools->envi);
 			free (my_tools.tmp);
 			my_tools.i++;
@@ -137,11 +159,7 @@ void	my_loop(t_tools *tools)
 		basic_cmd(tools);
 	else
 	{
-		tools->pid = ft_calloc(sizeof(int), tools->pipes + 2);
-		if (!tools->pid)
-			ft_error(1, tools);
-		else
-			executor(tools);
+		printf("have pipes\n");
 	}
 	tools->pipes = 0;
 	free(tools->args);

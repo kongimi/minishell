@@ -6,23 +6,78 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 16:30:10 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/08 12:11:20 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/16 15:55:29 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include <string.h>
 
-t_cmds	*initialize_cmd(char **str)
+int	count_args(t_lexer *lexer_list)
 {
-	t_cmds	*node;
+	t_lexer	*tmp;
+	int		i;
 
-	node = malloc(sizeof(t_cmds));
-	if (!node)
-		print_error("fail to malloc node", 2);
-	node->str = ft_dup_arr(str);
-	node->next = NULL;
-	node->prev = NULL;
-	return (node);
+	i = 0;
+	tmp = lexer_list;
+	while (tmp && tmp->token != PIPE)
+	{
+		if (tmp->i >= 0)
+			i++;
+		tmp = tmp->next;
+	}
+	return (i);
+}
+
+void	parser_error(int error, t_tools *tools, t_lexer *lexer_list)
+{
+	ft_lexerclear(&lexer_list);
+	ft_error(error, tools);
+}
+
+// t_cmds	*ft_cmdsnew(char **str,
+// 	int num_redirections, t_lexer *redirections)
+t_cmds	*ft_cmdsnew(char **str)
+{
+	t_cmds	*new_element;
+
+	new_element = (t_cmds *)malloc(sizeof(t_cmds));
+	if (!new_element)
+		return (0);
+	new_element->str = str;
+	// new_element->builtin = builtin_arr(str[0]);
+	new_element->hd_file_name = NULL;
+	// new_element->num_redirections = num_redirections;
+	// new_element->redirections = redirections;
+	new_element->next = NULL;
+	new_element->prev = NULL;
+	return (new_element);
+}
+
+t_cmds	*initialize_cmd(t_parser_tools *parser_tools)
+{
+	char	**str;
+	int		i;
+	int		arg_size;
+	t_lexer	*tmp;
+
+	i = 0;
+	arg_size = count_args(parser_tools->lexer_list);
+	str = ft_calloc(arg_size + 1, sizeof(char *));
+	if (!str)
+		parser_error(1, parser_tools->tools, parser_tools->lexer_list);
+	tmp = parser_tools->lexer_list;
+	while (arg_size > 0)
+	{
+		if (tmp->str)
+		{
+			str[i++] = ft_strdup(tmp->str);
+			ft_lexerdelone(&parser_tools->lexer_list, tmp->i);
+			tmp = parser_tools->lexer_list;
+		}
+		arg_size--;
+	}
+	return (ft_cmdsnew(str));
 }
 
 void	count_pipes(t_lexer *lexer_list, t_tools *tools)
@@ -99,6 +154,7 @@ void	ft_cmds_add_back(t_cmds **lst, t_cmds *new)
 	if (*lst == NULL)
 	{
 		*lst = new;
+		printf("*lst = NULL\n");
 		return ;
 	}
 	while (tmp->next != NULL)
@@ -107,13 +163,21 @@ void	ft_cmds_add_back(t_cmds **lst, t_cmds *new)
 	new->prev = tmp;
 }
 
+t_parser_tools	init_parser_tools(t_lexer *lexer_list, t_tools *tools)
+{
+	t_parser_tools	parser_tools;
+
+	parser_tools.lexer_list = lexer_list;
+	parser_tools.redirections = NULL;
+	parser_tools.num_redirections = 0;
+	parser_tools.tools = tools;
+	return (parser_tools);
+}
+
 int	parser(t_tools *tools)
 {
 	t_cmds	*node;
-	t_lexer	*tmp;
-	char	**str;
-	int		i;
-	int		lexer_len;
+	t_parser_tools	parser_tools;
 
 	tools->cmds = NULL;
 	count_pipes(tools->lexer_list, tools);
@@ -126,33 +190,19 @@ int	parser(t_tools *tools)
 	// 	return (1);
 	// }
 
-	
-	
-	tmp = tools->lexer_list;
-	lexer_len = 1;
-	while (tmp->next)
-	{
-		lexer_len++;
-		tmp = tmp->next;
-	}
-	str = malloc(sizeof(t_lexer) * lexer_len + 1);
-	i = 0;
 	while (tools->lexer_list)
 	{
 		if (tools->lexer_list && tools->lexer_list->token == PIPE)
 			ft_lexerdelone(&tools->lexer_list, tools->lexer_list->i);
-		str[i] = ft_strdup(tools->lexer_list->str);
-		i++;
-		str[i] = 0;
-		node = initialize_cmd(str);
-		if (!tools->cmds)
-			tools->cmds = &node;
-		else
-			ft_cmds_add_back(tools->cmds, node);
-		tmp = tools->lexer_list->next;
-		free (tools->lexer_list->str);
-		free (tools->lexer_list);
-		tools->lexer_list = tmp;
+		parser_tools = init_parser_tools(tools->lexer_list, tools);
+		node = initialize_cmd(&parser_tools);
+		if (!tools->cmds){
+			tools->cmds = node;
+		}
+		else{
+			ft_cmds_add_back(&tools->cmds, node);
+		}
+		tools->lexer_list = parser_tools.lexer_list;
 	}
 	return (1);
 }

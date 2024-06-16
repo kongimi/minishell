@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 13:45:41 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/06 13:25:33 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/16 15:35:00 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,8 +116,9 @@ int	token_analyze(t_tools *tools)
 	{
 		j = 0;
 		i += skip_space(tools->args, i);
-		if (!check_token(tools->args[i]))
+		if (!check_token(tools->args[i])){
 			j = read_words(i, tools->args, &tools->lexer_list);
+		}
 		else
 			j = handle_token(tools->args, i, &tools->lexer_list);
 		if (j < 0)
