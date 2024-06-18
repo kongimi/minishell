@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 16:30:10 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/16 15:55:29 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/18 11:40:29 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,8 +168,8 @@ t_parser_tools	init_parser_tools(t_lexer *lexer_list, t_tools *tools)
 	t_parser_tools	parser_tools;
 
 	parser_tools.lexer_list = lexer_list;
-	parser_tools.redirections = NULL;
-	parser_tools.num_redirections = 0;
+	// parser_tools.redirections = NULL;
+	// parser_tools.num_redirections = 0;
 	parser_tools.tools = tools;
 	return (parser_tools);
 }

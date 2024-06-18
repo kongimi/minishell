@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 23:49:35 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/16 15:44:09 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/18 11:54:54 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,10 @@ void	my_loop(t_tools *tools)
 		basic_cmd(tools);
 	else
 	{
-		printf("have pipes\n");
+		tools->pid = ft_calloc(sizeof(int), tools->pipes + 2);
+		if (!tools->pid)
+			ft_error(1, tools);
+		executor(tools);
 	}
 	tools->pipes = 0;
 	free(tools->args);
