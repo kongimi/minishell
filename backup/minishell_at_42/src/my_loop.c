@@ -6,7 +6,7 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 23:49:35 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/18 11:54:54 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/22 14:22:59 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,15 @@ void	basic_cmd2(t_tools *tools)
 	int				i;
 
 	tmp_cmds = tools->cmds;
-	if (!access(tmp_cmds->str[0], X_OK))
+	if (!access(tmp_cmds->str[0], F_OK))
 			execve(tmp_cmds->str[0], tmp_cmds->str, tools->envi);
 		i = 0;
 		while (tools->paths[i])
 		{
 			tmp = ft_strjoin(tools->paths[i], tmp_cmds->str[0]);
-			if (!access(tmp, F_OK))
+			if (!access(tmp, X_OK)){
 				execve(tmp, tmp_cmds->str, tools->envi);
+			}
 			free (tmp);
 			i++;
 		}
@@ -155,6 +156,7 @@ void	my_loop(t_tools *tools)
 		exit (0);
 	}
 	parser(tools);
+
 	if (!tools->pipes)
 		basic_cmd(tools);
 	else

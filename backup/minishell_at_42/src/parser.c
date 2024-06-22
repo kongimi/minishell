@@ -6,11 +6,12 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 16:30:10 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/18 11:40:29 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/22 11:42:03 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include <stdio.h>
 #include <string.h>
 
 int	count_args(t_lexer *lexer_list)
@@ -174,6 +175,25 @@ t_parser_tools	init_parser_tools(t_lexer *lexer_list, t_tools *tools)
 	return (parser_tools);
 }
 
+void	print_cmd(t_tools *tools)
+{
+	t_tools	*tmp;
+	int		i;
+
+	tmp = tools;
+	i = 0;
+	while (tmp->cmds)
+	{
+		while (tools->cmds->str[i])
+		{
+			printf("%s ", tools->cmds->str[i]);
+			i++;
+		}
+		printf("\n");
+		tmp->cmds = tmp->cmds->next;
+	}
+}
+
 int	parser(t_tools *tools)
 {
 	t_cmds	*node;
@@ -181,14 +201,6 @@ int	parser(t_tools *tools)
 
 	tools->cmds = NULL;
 	count_pipes(tools->lexer_list, tools);
-	
-	// if (tools->lexer_list->token == PIPE)
-	// {
-	// 	ft_putendl_fd("minishell: parse error near '|'", STDERR_FILENO);
-	// 	ft_lexerclear(&tools->lexer_list);
-	// 	reset_tools(tools);
-	// 	return (1);
-	// }
 
 	while (tools->lexer_list)
 	{
@@ -202,6 +214,7 @@ int	parser(t_tools *tools)
 		else{
 			ft_cmds_add_back(&tools->cmds, node);
 		}
+		// print_cmd(tools);
 		tools->lexer_list = parser_tools.lexer_list;
 	}
 	return (1);

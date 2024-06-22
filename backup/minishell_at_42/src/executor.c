@@ -6,61 +6,60 @@
 /*   By: npiyapan <npiyapan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 13:13:32 by npiyapan          #+#    #+#             */
-/*   Updated: 2024/06/18 14:39:44 by npiyapan         ###   ########.fr       */
+/*   Updated: 2024/06/22 16:37:42 by npiyapan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include <stdio.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 int	executor(t_tools *tools)
 {
-	int		fd[2];
-	int		fork_id;
+	int			fd[2];
+	static int	i = 0;
+	int			fd_in;
 
+	fd_in = STDIN_FILENO;
 	while (tools->cmds)
 	{
-		if (pipe(fd) == -1)
-			printf("pipe error\n");
-		printf("test\n");
-		fork_id = fork();
-		if (fork_id == -1){
-			ft_error(5, tools);
+		if (tools->cmds->next){
+			if (pipe(fd) == -1)
+				perror("pipe error");
 		}
-		printf("fork_id = %d\n", fork_id);
-		if (fork_id == 0){ // child process
-			if (tools->cmds->prev){
-				write(2, "have prev\n", 10);
-				if (dup2(fd[0], STDIN_FILENO) == -1)
-					ft_error(4, tools);
-				// read(fd[0], "test read to fd1\n", 17);
-			}else {
-				write(2, "not have prev\n", 14);
-			}
-			if (close(fd[0] == -1))
-				printf("error to close fd\n");
+		tools->pid[i] = fork();
+		printf("tools.pid[%d] = %d\n", i, tools->pid[i]);
+		if (tools->pid[i]  == -1)	perror("fork");
+		if (tools->pid[i] == 0){ // child process
 			if (tools->cmds->next){
-				write(2, "have next\n", 10);
-				if (dup2(fd[1], STDOUT_FILENO) == -1)
-					perror("dup2");
-				write(2, "test write to fd1\n", 18);
-				write(fd[1], "test write to fd1\n", 18);
-			}else {
-				write(2, "not have next\n", 14);
+				dprintf(2, "dup stdout\n");
+				if (dup2(fd[1], STDOUT_FILENO) == -1)	perror("dup2");
+				dprintf(2, "fd[1] = %d\n", fd[1]);
+				if (close(fd[1]) == -1)	perror("close fd1");
 			}
-			if (close(fd[1]) == -1)
-				printf("error to close fd\n");
-			// basic_cmd2(tools);
-			
-			exit(0);
+			if (tools->cmds->prev){
+				dprintf(2, "dup stdin\n");
+				if (dup2(fd_in, STDIN_FILENO) == -1)	perror("dup2");
+				dprintf(2, "fd[0] = %d\n", fd[0]);
+				if (close(fd_in) == -1)	perror("close fd0");
+			}
+			dprintf(2, "do command %s\n", tools->cmds->str[0]);
+			basic_cmd2(tools);
 		}
+		// if (dup2(fd[0], STDIN_FILENO) == -1)	perror("dup2");
+		// dprintf(2, "fd[0] in parent = %d\n", fd[0]);
+		// if (close(fd[0]) == -1)	perror("close fd0");
+		i++;
 		if (tools->cmds->next)
+		{
 			tools->cmds = tools->cmds->next;
+		}
 		else
 			break;
 	}
-	waitpid(fork_id, NULL, 0);
+	dprintf(2, "exit while loop pid[%d] = %d\n", i - 1, tools->pid[i - 1]);
+	waitpid(tools->pid[i - 1], NULL, 0);
 	return (0);
 }
